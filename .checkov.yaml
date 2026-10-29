@@ -1,4 +1,0 @@
-framework:
-  - terraform
-compact: true
-quiet: true
