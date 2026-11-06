@@ -31,6 +31,7 @@ module "subnet" {
   prefix              = var.prefix
   delegate_web        = var.runtime == "webapp"
   allow_http_from     = var.allow_http_from
+  inbound_rules       = var.inbound_rules
   tags                = local.tags
 }
 
