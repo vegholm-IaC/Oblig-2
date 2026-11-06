@@ -1,7 +1,7 @@
-# Nettverkslaget for ALLE tjenestene: ressursgruppa, VNet-et, og ett subnett
-# med NSG per tjeneste.
-
 locals {
+  rg_navn   = "rg-${var.kortnavn}-oblig2-${var.miljo}"
+  vnet_navn = "vnet-${var.kortnavn}-${var.miljo}"
+
   tags = {
     eier  = var.kortnavn
     miljo = var.miljo
@@ -9,19 +9,20 @@ locals {
   }
 }
 
-resource "azurerm_resource_group" "this" {
-  name     = "rg-${var.kortnavn}-oblig2-${var.miljo}"
-  location = var.location
-  tags     = local.tags
+removed {
+  from = azurerm_resource_group.this
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-module "vnet" {
-  source              = "../../modules/vnet"
-  name                = "vnet-${var.kortnavn}-${var.miljo}"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-  address_space       = var.address_space
-  tags                = local.tags
+removed {
+  from = module.vnet
+
+  lifecycle {
+    destroy = false
+  }
 }
 
 module "subnet" {
@@ -29,9 +30,9 @@ module "subnet" {
   for_each = var.tjenester
 
   service             = each.key
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-  vnet_name           = module.vnet.name
+  resource_group_name = local.rg_navn
+  location            = var.location
+  vnet_name           = local.vnet_navn
   prefix              = each.value.prefix
   delegate_web        = each.value.runtime == "webapp"
   allow_http_from     = var.allow_http_from
