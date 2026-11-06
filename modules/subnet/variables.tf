@@ -39,3 +39,13 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "inbound_rules" {
+  description = "Innkommende TCP-regler i NSG-en, i tillegg til HTTP."
+  type = map(object({
+    priority = number
+    port     = string
+    source   = string
+  }))
+  default = {}
+}
